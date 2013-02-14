@@ -1,0 +1,58 @@
+body.use-base:
+//	font-family: 'Source Code Pro', sans-serif
+	overflow : hidden
+	background-color:#272822
+
+
+//body .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default :
+//	 background: #595959 repeat-x scroll 50% 50%
+//	 color : #D6D6D6
+//
+//body .ui-widget-header:
+//	background: #C6C6C6
+.WordCloud:
+	.controls:
+		position:relative
+		z-index : 2
+	 	& > *:
+			float:left
+			margin : 20px
+	.container:
+		text-align: center
+		.word:
+			line-height : 1em
+			position    : absolute
+			display     : inline-block
+			//border    : 1px solid black
+			left        : 0
+			top         : 0
+			-moz-transition-property : "left,top"
+			-moz-transition-duration : "0.5s"
+			span:
+				padding:5px
+			&.r90 :
+				-moz-transform           : "rotate(270deg)"
+				-webkit-transform        : "rotate(270deg)"
+				-webkit-transform-origin : 100% 100%
+				-moz-transform-origin    : top right
+
+
+.Dataviz:
+	background-color: #EAEAEA
+	.item.actual:
+		display: inline-block
+		position: relative
+		.barre:
+			background-color: #7D9EF1
+			&:hover:
+				background-color: #0057F4
+			&.selected:
+				background-color: #FF6C6C
+				&:hover:
+					background-color: red
+			.value:
+				text-align : center
+				position   : relative
+				top        : -16px
+.legend:
+	padding: 0 20px"

@@ -1,0 +1,24 @@
+ul.fields:
+	padding:10px
+	> li:
+		padding-bottom: 10px
+		li:
+			padding-left:20px
+#ChooseCollection:
+	.collections:
+		padding-top: 10px
+		li:
+			padding-left:20px
+.Do:
+	background-color:#AFD0D7
+	position:fixed
+	right: 0px
+	top: 0px
+	bottom: 0px
+	padding: 20px
+	text-align:right
+	width: 60%
+	#result:
+		text-align:left
+		pre:
+			overflow: auto

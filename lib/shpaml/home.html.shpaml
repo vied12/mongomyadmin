@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+#Connect.widget data-widget=mongomyadmin.Connect
+	form.form-horizontal
+		.control-group
+			label.control-label for=inputIp | Ip
+			.controls
+				> input#inputIp type=text placeholder=Ip
+		.control-group
+			label.control-label for=inputPort | Port
+			.controls
+				> input#inputPort type=text placeholder=Port
+		control-group
+			.controls
+				button.btn.do type=submit data-action=connect | Connect
+
+#ChooseCollection.widget data-widget=mongomyadmin.ChooseCollection
+	ul.databases
+		li.database.template 
+			a.value.out href="" | {##}
+	ul.collections
+		li.collection.template 
+			a.internal.value.out href="" | {##}
+
+#Explorer.widget data-widget=mongomyadmin.Explorer
+	ul.fields
+		li.field.template 
+			span.value.out | key
+			a.occurence.internal
+				| (
+				span.occurence.out | {##}
+				| )
+			a.list.internal
+				| [
+				span.list.out | {##}
+				| ]
+			a.doc.internal.do data-action=onSubCollectionClick
+				| &lt;
+				span.doc.out | {##}
+				| &gt;
+	.Do
+		textarea | {##}
+		button.btn.do type=submit data-action=doQueryAction | Do
+		#result
+			pre.prettyprint | {##}
+{% endblock %}
