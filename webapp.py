@@ -7,8 +7,8 @@
 # -----------------------------------------------------------------------------
 # License : GNU Lesser General Public License
 # -----------------------------------------------------------------------------
-# Creation : 
-# Last mod : 
+# Creation : 24-Jan-2013
+# Last mod : 15-Feb-2013
 # -----------------------------------------------------------------------------
 
 from flask import Flask, render_template, request, send_file, Response, abort, session, redirect, url_for
