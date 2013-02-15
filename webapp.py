@@ -37,8 +37,7 @@ def getCollections(ip, port, database):
 
 @app.route("/api/<ip>/<int:port>/<database>/<collection>/schema")
 def getSchema(ip, port, database, collection):
-	keys = {}
-
+	keys    = {}
 	def _getSchema(document, result):
 		if not type(document) is dict:
 			return None
@@ -46,15 +45,24 @@ def getSchema(ip, port, database, collection):
 			if not result.get(key):
 				result[key] = {}
 			result[key]['_occurence'] = result[key].get('_occurence', 0) + 1
+			# 2d
+			if key in two_d_fields:
+				result[key]['_2d'] = True
 			if type(value) is list:
 				result[key]['_lists'] = result[key].get('_lists', 0) + 1
 			elif type(value) is dict:
 				result[key]['_documents'] = result[key].get('_documents', 0) + 1
 				_getSchema(value, result[key])
 
-	connection = pymongo.MongoClient(ip, port)
-	db         = connection[database]
-	collection = db[collection]
+	connection   = pymongo.MongoClient(ip, port)
+	db           = connection[database]
+	collection   = db[collection]
+	# 2d
+	indexes      = collection.index_information()
+	two_d_fields = []
+	for name, values in indexes.items():
+		if values['key'][0][1] == '2d':
+			two_d_fields.append(values['key'][0][0])
 	for document in collection.find():
 		_getSchema(document, keys)
 	return json.dumps(keys)

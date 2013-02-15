@@ -92,6 +92,7 @@ class mongomyadmin.Explorer extends Widget
 			fieldTemplate : "li.field"
 			textarea      : "textarea"
 			result        : "#result pre"
+			map           : "#map"
 		}
 
 		@ACTIONS = ['doQueryAction', 'onSubCollectionClick']
@@ -101,6 +102,8 @@ class mongomyadmin.Explorer extends Widget
 		@ip         = null
 		@port       = null
 		@schema     = null
+		@map        = null
+		@map_markers = []
 
 	bindUI: (ui) =>
 		super
@@ -114,8 +117,13 @@ class mongomyadmin.Explorer extends Widget
 		this.relayout()
 
 	relayout: =>
-		height = $(window).height() - @uis.result.offset().top - 10
-		@uis.result.css('height', height)
+		code_height = $(window).height() - @uis.result.offset().top - 10
+		if @map?
+			code_height = code_height/2
+			map_height = $(window).height() - @uis.result.offset().top - code_height
+			@uis.map.css('height', map_height)
+
+		@uis.result.css('height', code_height)
 
 	onCollectionSelected: (event, ip, port, db, collection) =>
 			@ip         = ip
@@ -126,7 +134,7 @@ class mongomyadmin.Explorer extends Widget
 
 	onSubCollectionClick: (e) =>
 		parent_list = $(e.currentTarget).parent('li')
-		data        = Utils.clone(@data)
+		data        = Utils.clone(@schema)
 		keys        = []
 		for parent in $(e.currentTarget).parents('li').reverse()
 			_key = $(parent).attr('data-key')
@@ -135,7 +143,7 @@ class mongomyadmin.Explorer extends Widget
 		if parent_list.find('li').length > 0
 			parent_list.find('li.actual').remove()
 		for key, value of data
-			if key != '_occurence' and key != '_documents' and key != '_lists'
+			if key != '_occurence' and key != '_documents' and key != '_lists' and key != '_2d'
 				nui = this.createRepresentation(key, value, keys.join('.'))
 				parent_list.append(nui)
 		URL.enableLinks(@uis.fieldsList)
@@ -150,7 +158,7 @@ class mongomyadmin.Explorer extends Widget
 		$.ajax({url:"/api/#{@ip}/#{@port}/#{@db}/#{@collection}/schema", success:this.setData, dataType:'json'})
 
 	setData: (data) =>
-		@data = data
+		@schema = data
 		@uis.fieldsList.find('.actual').remove()
 		for key, value of data
 			nui = this.createRepresentation(key, value)
@@ -168,7 +176,9 @@ class mongomyadmin.Explorer extends Widget
 		})
 		nui.find('.occurence').attr('href', "#+field=#{sub_key}#{key}")
 		nui.find('.list'     ).attr('href', "#+list=#{sub_key}#{key}")
-		# nui.find('.doc'      ).attr('href', "#+doc=#{sub_key}#{key}")
+		nui.find('.doc'      ).attr('href', "#+doc=#{sub_key}#{key}")
+		if value._2d?
+			nui.append('[geo]')
 		if not value._documents?
 			nui.find('.doc').addClass('hidden')
 		if not value._lists?
@@ -177,23 +187,50 @@ class mongomyadmin.Explorer extends Widget
 		return nui
 
 	setResults: (data) =>
-		@uis.result.html(JSON.stringify(JSON.parse(data), undefined, 4))
+		data = JSON.parse(data)
+		if @limit > 0
+			data = data[0..@limit]
+		@limit = 0
+		@uis.result.html(JSON.stringify(data, undefined, 4))
 		prettyPrint()
+		this.initMap()
+		# markers
+		for doc in data
+			for key, value of doc
+				if @schema[key]['_2d']
+					marker = L.marker([value['lat'], value['long']]).addTo(@map)
+					marker.bindPopup(doc['_id']['$oid'])
+					@map_markers.push(marker)
+
+	initMap: =>
+		if not @map?
+			@map = L.map('map').setView([51.505, -0.09], 2)
+			@map.on('click', this.onMapClick)
+			L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 4}).addTo(@map)
+		for marker in @map_markers
+			@map.removeLayer(marker)
+		this.relayout()
+
+	onMapClick: (e) =>
+		query = "{\"loc\": { \"$near\": [ #{e.latlng.lat}, #{e.latlng.lng} ] } }"
+		@uis.textarea.val(query)
+		this.doQuery(query, 3)
 
 	containThatField: (field) =>
 		query = "{\"#{field}\":{\"$exists\":1}}"
-		@uis.textarea.text(query)
+		@uis.textarea.val(query)
 		this.doQuery(query)
 
 	containThatList: (list) =>
 		query = "{\"$where\" : \"Array.isArray(this.#{list})\" }"
-		@uis.textarea.text(query)
+		@uis.textarea.val(query)
 		this.doQuery(query)
 
 	doQueryAction: (e) =>
-		this.doQuery(@uis.textarea.text())
+		this.doQuery(@uis.textarea.val())
 
-	doQuery: (query) =>
+	doQuery: (query, limit=0) =>
+		@limit = limit
 		$.ajax({
 			url      : "/api/do/#{@ip}/#{@port}/#{@db}/#{@collection}"
 			success  : this.setResults

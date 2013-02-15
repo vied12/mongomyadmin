@@ -18,7 +18,12 @@ ul.fields:
 	padding: 20px
 	text-align:right
 	width: 60%
+	textarea:
+		width:80%
 	#result:
 		text-align:left
 		pre:
 			overflow: auto
+	#map:
+		text-align:left
+		height: 300px

@@ -43,4 +43,5 @@
 		button.btn.do type=submit data-action=doQueryAction | Do
 		#result
 			pre.prettyprint | {##}
+		#map | {##}
 {% endblock %}

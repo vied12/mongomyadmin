@@ -9,6 +9,7 @@ html lang="en"
 		> link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/mongomyadmin.css')}}" media="all"
 		> link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/prettify.css')}}" media="all"
 		> link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/vader/jquery-ui.css" media="all"
+		> link type="text/css" rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" media="all"
 		script type="text/javascript" src="{{url_for('static', filename='js/jquery172.js')}}" | {# #}
 		script type="text/javascript" src="http://code.jquery.com/ui/1.9.1/jquery-ui.js" | {# #}
 	body.use-base
@@ -18,4 +19,5 @@ html lang="en"
 		script type="text/javascript" src="{{url_for('static', filename='js/prettify.js')  }}"                | {# #}
 		script type="text/javascript" src="{{url_for('static', filename='js/widget.js')   }}"                 | {# #}
 		script type="text/javascript" src="{{url_for('static', filename='js/formatting.js')  }}"              | {# #}
+		script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"                   | {# #}
 		script type="text/javascript" src="{{url_for('static', filename='js/mongomyadmin.js')  }}"            | {# #}
